@@ -2,144 +2,432 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Homework Helper</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculator and Games</title>
   <style>
+    /* CSS reset */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: Arial, sans-serif;
-      background: #f4f4f4;
+      background: #f0f4f8;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+    }
+    #container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 1000px;
+    }
+    nav#menu {
       display: flex;
       justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
+      flex-wrap: wrap;
+      margin: 20px;
     }
-    .calculator {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      max-width: 350px;
+    nav#menu button {
+      margin: 5px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 4px;
+      background: #007BFF;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    nav#menu button:hover {
+      background: #0056b3;
+    }
+    #btn-sound {
+      background: #28a745;
+    }
+    #btn-sound.off { background: #dc3545; }
+    .content-section {
+      width: 90%;
+      max-width: 600px;
+      min-height: 400px;
+      background: white;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+    .active { display: flex; }
+    /* Calculator styles */
+    #calc-container {
+      background: #1e293b;
+      color: white;
+    }
+    #display {
+      width: 100%;
+      height: 60px;
+      background: #333;
+      border: none;
+      margin-bottom: 10px;
+      font-size: 24px;
+      text-align: right;
+      padding: 10px;
+      border-radius: 4px;
+      color: #0f0;
+    }
+    .calc-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-gap: 5px;
       width: 100%;
     }
-    .display {
-      background: #222;
-      color: #fff;
-      font-size: 2em;
-      padding: 10px;
-      text-align: right;
-      margin-bottom: 10px;
-      border-radius: 5px;
-    }
-    .buttons .row {
-      display: flex;
-      margin-bottom: 5px;
-    }
-    .buttons button {
-      flex: 1;
+    .calc-buttons button {
+      font-size: 20px;
       padding: 15px;
-      margin-right: 5px;
-      font-size: 1em;
       border: none;
-      border-radius: 5px;
-      background: #e0e0e0;
+      border-radius: 4px;
+      background: #334155;
+      color: #fff;
       cursor: pointer;
+      transition: background 0.3s;
     }
-    .buttons button:last-child {
-      margin-right: 0;
+    .calc-buttons button:hover {
+      background: #475569;
     }
-    .operator {
-      background: #f0ad4e;
-      color: #fff;
+    .calc-buttons .operator {
+      background: #64748b;
     }
-    .clear {
-      background: #d9534f;
-      color: #fff;
+    .calc-buttons .operator:hover {
+      background: #94a3b8;
     }
-    .disguised {
-      background: #5bc0de;
-      color: #fff;
+    .calc-buttons .calc-clear {
+      background: #dc2626;
+    }
+    .calc-buttons .calc-clear:hover {
+      background: #b91c1c;
+    }
+    /* Canvas container (2D game and 3D game) */
+    #game2d-container, #game3d-container {
+      padding: 0;
+      border: none;
+      background: #000;
+      overflow: hidden;
+    }
+    /* Canvas element styling */
+    #game-2d, #game-3d {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 4px;
+    }
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      nav#menu button { flex: 1 1 100%; }
+      .content-section { width: 100%; }
     }
   </style>
 </head>
 <body>
-  <div class="calculator">
-    <div id="display" class="display">0</div>
-    <div class="buttons">
-      <div class="row">
-        <button onclick="append('7')">7</button>
-        <button onclick="append('8')">8</button>
-        <button onclick="append('9')">9</button>
-        <button class="operator" onclick="setOp('/')">÷</button>
+  <div id="container">
+    <nav id="menu">
+      <button id="btn-calc">Calculator</button>
+      <button id="btn-2d">2D Shooter</button>
+      <button id="btn-3d">3D Shooter</button>
+      <button id="btn-sound" class="off">Sound Off</button>
+    </nav>
+
+    <!-- Calculator Section -->
+    <div id="calc-container" class="content-section active">
+      <input type="text" id="display" disabled value="0">
+      <div class="calc-buttons">
+        <button class="calc-clear">C</button>
+        <button class="calc-none" disabled></button>
+        <button class="operator">/</button>
+        <button class="operator">*</button>
+        <button>7</button><button>8</button><button>9</button><button class="operator">-</button>
+        <button>4</button><button>5</button><button>6</button><button class="operator">+</button>
+        <button>1</button><button>2</button><button>3</button><button class="calc-eq">=</button>
+        <button>0</button><button>.</button><button class="calc-none" disabled></button><button class="calc-none" disabled></button>
       </div>
-      <div class="row">
-        <button onclick="append('4')">4</button>
-        <button onclick="append('5')">5</button>
-        <button onclick="append('6')">6</button>
-        <button class="operator" onclick="setOp('*')">×</button>
-      </div>
-      <div class="row">
-        <button onclick="append('1')">1</button>
-        <button onclick="append('2')">2</button>
-        <button onclick="append('3')">3</button>
-        <button class="operator" onclick="setOp('-')">−</button>
-      </div>
-      <div class="row">
-        <button onclick="append('0')">0</button>
-        <button onclick="append('.')">.</button>
-        <button onclick="calculate()">=</button>
-        <button class="operator" onclick="setOp('+')">+</button>
-      </div>
-      <div class="row">
-        <button class="clear" onclick="clearAll()">C</button>
-        <!-- Hidden game button -->
-        <button class="disguised" onclick="openGame()">Scientific Tools</button>
-        <button class="disguised" onclick="alert('Coming soon: Equation Solver')">Equation Solver</button>
-      </div>
+    </div>
+
+    <!-- 2D Shooter Game Section -->
+    <div id="game2d-container" class="content-section">
+      <canvas id="game-2d"></canvas>
+    </div>
+
+    <!-- 3D Maze Shooter Section -->
+    <div id="game3d-container" class="content-section">
+      <canvas id="game-3d"></canvas>
     </div>
   </div>
 
   <script>
-    let current = '';
-    let operator = '';
-    let prev = '';
+    // Section Toggle
+    var sections = {
+      calc: document.getElementById('calc-container'),
+      game2d: document.getElementById('game2d-container'),
+      game3d: document.getElementById('game3d-container')
+    };
+    function showSection(section) {
+      for (var key in sections) {
+        if (sections.hasOwnProperty(key)) {
+          sections[key].classList.remove('active');
+        }
+      }
+      if (section === 'calc') {
+        sections.calc.classList.add('active');
+      } else if (section === 'game2d') {
+        sections.game2d.classList.add('active');
+      } else if (section === 'game3d') {
+        sections.game3d.classList.add('active');
+      }
+    }
+    document.getElementById('btn-calc').addEventListener('click', function(){ showSection('calc'); });
+    document.getElementById('btn-2d').addEventListener('click', function(){ showSection('game2d'); });
+    document.getElementById('btn-3d').addEventListener('click', function(){ showSection('game3d'); });
 
-    function append(val) {
-      const display = document.getElementById('display');
-      if (display.innerText === '0') display.innerText = '';
-      display.innerText += val;
+    // Sound toggle
+    var soundOn = false;
+    var btnSound = document.getElementById('btn-sound');
+    btnSound.addEventListener('click', function(){
+      soundOn = !soundOn;
+      if(soundOn) {
+        btnSound.textContent = 'Sound On';
+        btnSound.classList.remove('off');
+      } else {
+        btnSound.textContent = 'Sound Off';
+        btnSound.classList.add('off');
+      }
+      // (WebAudio sounds check soundOn flag)
+    });
+
+    // Calculator functionality
+    var display = document.getElementById('display');
+    var calcButtons = document.querySelectorAll('#calc-container .calc-buttons button');
+    var calcExpr = '';
+    calcButtons.forEach(function(btn) {
+      btn.addEventListener('click', function(){
+        var val = btn.textContent;
+        if (btn.classList.contains('calc-clear')) {
+          calcExpr = '';
+          display.value = '0';
+        } else if (btn.classList.contains('calc-eq')) {
+          try {
+            var result = eval(calcExpr);
+            display.value = result;
+            calcExpr = result.toString();
+          } catch(e) {
+            display.value = 'Error';
+            calcExpr = '';
+          }
+        } else {
+          // number or operator clicked
+          if (btn.classList.contains('operator') && calcExpr === '') {
+            return;
+          }
+          if (btn.classList.contains('operator') && /[+\-*/]$/.test(calcExpr)) {
+            calcExpr = calcExpr.slice(0, -1) + val;
+          } else {
+            calcExpr += val;
+          }
+          display.value = calcExpr;
+        }
+      });
+    });
+
+    // Sound generation (simple beeps)
+    function playSound(freq, duration){
+      if(!soundOn) return;
+      var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      var oscillator = audioCtx.createOscillator();
+      oscillator.type = 'square';
+      oscillator.frequency.value = freq;
+      oscillator.connect(audioCtx.destination);
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + duration);
     }
 
-    function setOp(op) {
-      prev = document.getElementById('display').innerText;
-      operator = op;
-      document.getElementById('display').innerText = '';
+    // 2D Shooter Game
+    var canvas2d = document.getElementById('game-2d');
+    var ctx2d = canvas2d.getContext('2d');
+    canvas2d.width = 600;
+    canvas2d.height = 400;
+    var player2d = { x: 300, y: 200 };
+    var keys = {};
+    var bullets = [];
+    var enemies = [];
+    for(var i=0; i<5; i++) {
+      enemies.push({
+        x: Math.random()*canvas2d.width,
+        y: Math.random()*canvas2d.height,
+        size: 15,
+        dx: (Math.random()-0.5)*2,
+        dy: (Math.random()-0.5)*2
+      });
     }
-
-    function calculate() {
-      const currentVal = parseFloat(document.getElementById('display').innerText);
-      const prevVal = parseFloat(prev);
-      let result = 0;
-
-      if (operator === '+') result = prevVal + currentVal;
-      else if (operator === '-') result = prevVal - currentVal;
-      else if (operator === '*') result = prevVal * currentVal;
-      else if (operator === '/') result = currentVal !== 0 ? prevVal / currentVal : 'Error';
-
-      document.getElementById('display').innerText = result;
+    document.addEventListener('keydown', function(e){ keys[e.key] = true; });
+    document.addEventListener('keyup', function(e){ keys[e.key] = false; });
+    // Shoot on mouse click
+    canvas2d.addEventListener('click', function(e){
+      var rect = canvas2d.getBoundingClientRect();
+      var mx = e.clientX - rect.left;
+      var my = e.clientY - rect.top;
+      var dx = mx - player2d.x;
+      var dy = my - player2d.y;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if(dist > 0) {
+        bullets.push({ x: player2d.x, y: player2d.y, dx: dx/dist*5, dy: dy/dist*5, life: 0 });
+        playSound(600, 0.1);
+      }
+    });
+    function game2dLoop() {
+      // Movement
+      var speed = 2;
+      if(keys['w']||keys['ArrowUp'])    { player2d.y -= speed; }
+      if(keys['s']||keys['ArrowDown'])  { player2d.y += speed; }
+      if(keys['a']||keys['ArrowLeft'])  { player2d.x -= speed; }
+      if(keys['d']||keys['ArrowRight']) { player2d.x += speed; }
+      // Boundaries
+      if(player2d.x < 0) player2d.x = 0;
+      if(player2d.x > canvas2d.width) player2d.x = canvas2d.width;
+      if(player2d.y < 0) player2d.y = 0;
+      if(player2d.y > canvas2d.height) player2d.y = canvas2d.height;
+      // Update enemies
+      enemies.forEach(function(en) {
+        en.x += en.dx;
+        en.y += en.dy;
+        if(en.x < 0 || en.x > canvas2d.width) en.dx *= -1;
+        if(en.y < 0 || en.y > canvas2d.height) en.dy *= -1;
+      });
+      // Update bullets and collisions
+      bullets = bullets.filter(function(b){
+        b.life++;
+        b.x += b.dx;
+        b.y += b.dy;
+        if(b.x<0 || b.x>canvas2d.width || b.y<0 || b.y>canvas2d.height || b.life>100) {
+          return false;
+        }
+        for(var i=0;i<enemies.length;i++){
+          var en = enemies[i];
+          var dx = b.x - en.x, dy = b.y - en.y;
+          if(dx*dx+dy*dy < en.size*en.size) {
+            enemies.splice(i, 1);
+            playSound(100, 0.2);
+            return false;
+          }
+        }
+        return true;
+      });
+      // Draw 2D game
+      ctx2d.fillStyle = '#000';
+      ctx2d.fillRect(0,0,canvas2d.width, canvas2d.height);
+      // Player (green circle)
+      ctx2d.fillStyle = '#0f0';
+      ctx2d.beginPath();
+      ctx2d.arc(player2d.x, player2d.y, 10, 0, Math.PI*2);
+      ctx2d.fill();
+      // Enemies (red circles)
+      enemies.forEach(function(en){
+        ctx2d.fillStyle = '#f00';
+        ctx2d.beginPath();
+        ctx2d.arc(en.x, en.y, en.size, 0, Math.PI*2);
+        ctx2d.fill();
+      });
+      // Bullets (yellow)
+      bullets.forEach(function(b){
+        ctx2d.fillStyle = '#ff0';
+        ctx2d.beginPath();
+        ctx2d.arc(b.x, b.y, 3, 0, Math.PI*2);
+        ctx2d.fill();
+      });
+      requestAnimationFrame(game2dLoop);
     }
+    game2dLoop();
 
-    function clearAll() {
-      document.getElementById('display').innerText = '0';
-      current = '';
-      prev = '';
-      operator = '';
+    // 3D Maze Shooter (raycasting)
+    var canvas3d = document.getElementById('game-3d');
+    var ctx3d = canvas3d.getContext('2d');
+    canvas3d.width = 300;
+    canvas3d.height = 200;
+    var map = [
+      [1,1,1,1,1,1],
+      [1,0,0,0,0,1],
+      [1,0,0,0,0,1],
+      [1,0,0,0,0,1],
+      [1,0,0,0,0,1],
+      [1,1,1,1,1,1]
+    ];
+    var tileSize = 64;
+    var player3d = { x: 160, y: 160, angle: 0 };
+    function game3dLoop(){
+      var moveSpeed = 2;
+      var rotSpeed = 0.04;
+      if(keys['w']||keys['ArrowUp']) {
+        player3d.x += Math.cos(player3d.angle)*moveSpeed;
+        player3d.y += Math.sin(player3d.angle)*moveSpeed;
+      }
+      if(keys['s']||keys['ArrowDown']) {
+        player3d.x -= Math.cos(player3d.angle)*moveSpeed;
+        player3d.y -= Math.sin(player3d.angle)*moveSpeed;
+      }
+      if(keys['a']||keys['ArrowLeft']) {
+        player3d.angle -= rotSpeed;
+      }
+      if(keys['d']||keys['ArrowRight']) {
+        player3d.angle += rotSpeed;
+      }
+      // Wall collision (simple check)
+      var px = Math.floor(player3d.x/tileSize);
+      var py = Math.floor(player3d.y/tileSize);
+      if(map[py][px] == 1) {
+        player3d.x -= Math.cos(player3d.angle)*moveSpeed;
+        player3d.y -= Math.sin(player3d.angle)*moveSpeed;
+      }
+      // Draw ceiling and floor
+      ctx3d.fillStyle = 'skyblue';
+      ctx3d.fillRect(0, 0, canvas3d.width, canvas3d.height/2);
+      ctx3d.fillStyle = 'grey';
+      ctx3d.fillRect(0, canvas3d.height/2, canvas3d.width, canvas3d.height/2);
+      // Raycasting
+      var fov = Math.PI/3;
+      for(var i=0; i<canvas3d.width; i++){
+        var rayAngle = (player3d.angle - fov/2) + (i/canvas3d.width) * fov;
+        var sin = Math.sin(rayAngle), cos = Math.cos(rayAngle);
+        var distance = 0;
+        var hit = false;
+        var depth = 0;
+        while(!hit && distance < 300) {
+          distance += 1;
+          var testX = player3d.x + cos * distance;
+          var testY = player3d.y + sin * distance;
+          var mapX = Math.floor(testX/tileSize);
+          var mapY = Math.floor(testY/tileSize);
+          if(mapY>=0 && mapY<map.length && mapX>=0 && mapX<map[0].length){
+            if(map[mapY][mapX] == 1){
+              hit = true;
+              depth = distance;
+            }
+          } else {
+            hit = true;
+            depth = distance;
+          }
+        }
+        if(hit){
+          var fixDist = depth * Math.cos(player3d.angle - rayAngle);
+          var wallHeight = (tileSize * canvas3d.height) / fixDist;
+          if(wallHeight > canvas3d.height) wallHeight = canvas3d.height;
+          var shade = 1 - Math.min(1, fixDist/300);
+          ctx3d.fillStyle = 'rgba(' + Math.floor(255*shade) + ',' + Math.floor(255*shade) + ',' + Math.floor(255*shade) + ',1)';
+          ctx3d.fillRect(i, (canvas3d.height/2) - wallHeight/2, 1, wallHeight);
+        }
+      }
+      requestAnimationFrame(game3dLoop);
     }
-
-    function openGame() {
-      // GitHub mirror of 1v1-style shooter — not labeled as Fortnite or Xbox
-      window.open('https://math-helper-games.github.io/graph-simulator/', '_blank');
-    }
+    game3dLoop();
   </script>
 </body>
 </html>
