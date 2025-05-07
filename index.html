@@ -1,1 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Homework Helper</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .calculator {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      max-width: 350px;
+      width: 100%;
+    }
+    .display {
+      background: #222;
+      color: #fff;
+      font-size: 2em;
+      padding: 10px;
+      text-align: right;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+    .buttons .row {
+      display: flex;
+      margin-bottom: 5px;
+    }
+    .buttons button {
+      flex: 1;
+      padding: 15px;
+      margin-right: 5px;
+      font-size: 1em;
+      border: none;
+      border-radius: 5px;
+      background: #e0e0e0;
+      cursor: pointer;
+    }
+    .buttons button:last-child {
+      margin-right: 0;
+    }
+    .operator {
+      background: #f0ad4e;
+      color: #fff;
+    }
+    .clear {
+      background: #d9534f;
+      color: #fff;
+    }
+    .disguised {
+      background: #5bc0de;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div id="display" class="display">0</div>
+    <div class="buttons">
+      <div class="row">
+        <button onclick="append('7')">7</button>
+        <button onclick="append('8')">8</button>
+        <button onclick="append('9')">9</button>
+        <button class="operator" onclick="setOp('/')">÷</button>
+      </div>
+      <div class="row">
+        <button onclick="append('4')">4</button>
+        <button onclick="append('5')">5</button>
+        <button onclick="append('6')">6</button>
+        <button class="operator" onclick="setOp('*')">×</button>
+      </div>
+      <div class="row">
+        <button onclick="append('1')">1</button>
+        <button onclick="append('2')">2</button>
+        <button onclick="append('3')">3</button>
+        <button class="operator" onclick="setOp('-')">−</button>
+      </div>
+      <div class="row">
+        <button onclick="append('0')">0</button>
+        <button onclick="append('.')">.</button>
+        <button onclick="calculate()">=</button>
+        <button class="operator" onclick="setOp('+')">+</button>
+      </div>
+      <div class="row">
+        <button class="clear" onclick="clearAll()">C</button>
+        <button class="disguised" onclick="window.open('https://xbox.com/play', '_blank')">Scientific Tools</button>
+        <button class="disguised" onclick="window.open('https://xbox.com/play', '_blank')">Equation Solver</button>
+      </div>
+    </div>
+  </div>
 
+  <script>
+    let current = '';
+    let operator = '';
+    let prev = '';
+
+    function append(val) {
+      const display = document.getElementById('display');
+      if (display.innerText === '0') display.innerText = '';
+      display.innerText += val;
+    }
+
+    function setOp(op) {
+      prev = document.getElementById('display').innerText;
+      operator = op;
+      document.getElementById('display').innerText = '';
+    }
+
+    function calculate() {
+      const currentVal = parseFloat(document.getElementById('display').innerText);
+      const prevVal = parseFloat(prev);
+      let result = 0;
+
+      if (operator === '+') result = prevVal + currentVal;
+      else if (operator === '-') result = prevVal - currentVal;
+      else if (operator === '*') result = prevVal * currentVal;
+      else if (operator === '/') result = currentVal !== 0 ? prevVal / currentVal : 'Error';
+
+      document.getElementById('display').innerText = result;
+    }
+
+    function clearAll() {
+      document.getElementById('display').innerText = '0';
+      current = '';
+      prev = '';
+      operator = '';
+    }
+  </script>
+</body>
+</html>
