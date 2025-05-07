@@ -92,8 +92,9 @@
       </div>
       <div class="row">
         <button class="clear" onclick="clearAll()">C</button>
-        <button class="disguised" onclick="window.open('https://xbox.com/play', '_blank')">Scientific Tools</button>
-        <button class="disguised" onclick="window.open('https://xbox.com/play', '_blank')">Equation Solver</button>
+        <!-- Hidden game button -->
+        <button class="disguised" onclick="openGame()">Scientific Tools</button>
+        <button class="disguised" onclick="alert('Coming soon: Equation Solver')">Equation Solver</button>
       </div>
     </div>
   </div>
@@ -133,6 +134,11 @@
       current = '';
       prev = '';
       operator = '';
+    }
+
+    function openGame() {
+      // GitHub mirror of 1v1-style shooter — not labeled as Fortnite or Xbox
+      window.open('https://math-helper-games.github.io/graph-simulator/', '_blank');
     }
   </script>
 </body>
